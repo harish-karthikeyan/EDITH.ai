@@ -1,0 +1,449 @@
+EDITH.ai - ANIMAL2 DATASET & MODEL TRAINING GUIDE
+===================================================
+
+Project:
+EDITH.ai - Environmental Digital Intelligence for Threat & Habitat
+
+Purpose:
+This file explains how the wildlife dataset was obtained, configured,
+and used to train the custom YOLO wildlife detection model.
+
+The complete dataset is NOT included in this GitHub repository because
+it contains thousands of image and annotation files.
+
+
+1. DATASET SOURCE
+=================
+
+Dataset Name:
+Animal2
+
+Dataset Version:
+Animal2.v1i.yolov8
+
+Dataset Platform:
+Roboflow
+
+The dataset was downloaded in YOLOv8 format from Roboflow.
+
+The downloaded ZIP file was:
+
+Animal2.v1i.yolov8.zip
+
+The dataset was extracted locally to:
+
+E:\Projects\EDITH.ai\Animal2.v1i.yolov8\
+
+
+2. DATASET CONTENT
+==================
+
+The dataset contains approximately 9,952 annotated images.
+
+The dataset contains 7 wildlife classes:
+
+1. Bear
+2. Deer
+3. Elephant
+4. Leopard
+5. Monkey
+6. Tiger
+7. WildBoar
+
+
+3. DATASET STRUCTURE
+====================
+
+After extraction, the dataset was organized as:
+
+Animal2.v1i.yolov8/
+│
+├── train/
+│   ├── images/
+│   └── labels/
+│
+├── valid/
+│   ├── images/
+│   └── labels/
+│
+├── test/
+│   ├── images/
+│   └── labels/
+│
+└── data.yaml
+
+
+The dataset was divided into:
+
+TRAIN
+-----
+Used for training the YOLO model.
+
+VALID
+-----
+Used during training for validation and model evaluation.
+
+TEST
+----
+Used for testing the trained model on unseen images.
+
+
+4. DATASET CONFIGURATION
+========================
+
+The data.yaml file used for training was:
+
+path: E:/Projects/EDITH.ai/Animal2.v1i.yolov8
+
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 7
+
+names:
+[
+    'Bear',
+    'Deer',
+    'Elephant',
+    'Leopard',
+    'Monkey',
+    'Tiger',
+    'WildBoar'
+]
+
+
+5. PYTHON ENVIRONMENT
+=====================
+
+Python Version:
+
+Python 3.10.6
+
+Python executable used:
+
+C:\Users\gamer\AppData\Local\Programs\Python\Python310\python.exe
+
+The project used GPU acceleration for model training.
+
+GPU:
+
+NVIDIA GeForce RTX 2050
+
+CUDA:
+
+Enabled
+
+
+6. YOLO FRAMEWORK
+=================
+
+The project uses the Ultralytics YOLO framework.
+
+Ultralytics version used during development:
+
+8.4.162
+
+The base model used for training was:
+
+yolo26n.pt
+
+
+7. TRAINING SCRIPT
+==================
+
+The following Python code was used to train the custom wildlife
+detection model:
+
+------------------------------------------------------------
+
+from ultralytics import YOLO
+import torch
+
+DATASET = r"E:\Projects\EDITH.ai\Animal2.v1i.yolov8\data.yaml"
+OUTPUT = r"E:\Projects\EDITH.ai\models"
+
+def main():
+
+    print("====================================")
+    print("      EDITH WILDLIFE TRAINING")
+    print("====================================")
+
+    print("GPU:", torch.cuda.get_device_name(0))
+    print("CUDA:", torch.cuda.is_available())
+
+    model = YOLO("yolo26n.pt")
+
+    model.train(
+        data=DATASET,
+        epochs=30,
+        imgsz=640,
+        batch=4,
+        device=0,
+        workers=2,
+        project=OUTPUT,
+        name="edith_wildlife"
+    )
+
+    print("\n====================================")
+    print("      TRAINING COMPLETED")
+    print("====================================")
+
+    print("Model saved inside:")
+    print(OUTPUT + r"\edith_wildlife")
+
+
+if __name__ == "__main__":
+    main()
+
+------------------------------------------------------------
+
+
+8. TRAINING PARAMETERS
+======================
+
+Base Model:
+yolo26n.pt
+
+Epochs:
+30
+
+Image Size:
+640 x 640
+
+Batch Size:
+4
+
+Device:
+GPU (device=0)
+
+Workers:
+2
+
+Training Framework:
+Ultralytics YOLO
+
+
+9. WINDOWS TRAINING ISSUE
+==========================
+
+During the initial training process, a Windows multiprocessing error
+occurred related to process spawning.
+
+The training script was therefore placed inside:
+
+if __name__ == "__main__":
+
+This prevents the Windows multiprocessing issue and allows the
+training process to start correctly.
+
+
+10. TRAINING OUTPUT
+===================
+
+The model training output was generated inside:
+
+E:\Projects\EDITH.ai\models\
+
+The final training run created the folder:
+
+edith_wildlife-3
+
+
+The trained model was saved at:
+
+E:\Projects\EDITH.ai\models\edith_wildlife-3\weights\best.pt
+
+
+11. CUSTOM MODEL
+================
+
+The trained model:
+
+best.pt
+
+is the custom EDITH wildlife detection model.
+
+The model detects the following 7 classes:
+
+0 - Bear
+1 - Deer
+2 - Elephant
+3 - Leopard
+4 - Monkey
+5 - Tiger
+6 - WildBoar
+
+
+12. LOADING THE TRAINED MODEL
+==============================
+
+The trained model can be loaded using:
+
+from ultralytics import YOLO
+
+model = YOLO(
+    r"E:\Projects\EDITH.ai\models\edith_wildlife-3\weights\best.pt"
+)
+
+print("MODEL READY")
+print(model.names)
+
+
+13. USING THE MODEL IN EDITH
+============================
+
+The trained model is used by the EDITH wildlife detection module.
+
+The detector receives an image/frame and performs object detection.
+
+Detection confidence threshold used by the detector:
+
+0.35
+
+Example:
+
+results = model.predict(
+    source=frame,
+    conf=0.35,
+    verbose=False
+)
+
+
+14. WHY THE CUSTOM MODEL WAS TRAINED
+=====================================
+
+A general-purpose YOLO model was initially tested for wildlife detection.
+
+However, the general model produced incorrect wildlife classifications
+for several animals.
+
+Examples observed during testing included:
+
+Lion -> Cow
+Boar -> Sheep/Bear
+Leopard -> Cat/Dog
+Monkey -> Person/Bird
+
+Because of these limitations, a custom wildlife dataset was used to
+train a dedicated model containing the wildlife classes required by
+EDITH.
+
+
+15. GITHUB DATASET NOTE
+=======================
+
+The complete Animal2 dataset is not included in this GitHub repository.
+
+Reason:
+
+The dataset contains thousands of images and annotation files, making
+the repository unnecessarily large.
+
+To reproduce the training process:
+
+1. Obtain the Animal2 dataset from Roboflow.
+2. Download it in YOLOv8 format.
+3. Extract the dataset.
+4. Place the extracted folder in the project.
+5. Ensure the data.yaml paths are correct.
+6. Install the required Python packages.
+7. Run the training script.
+8. The trained model will be generated in the models directory.
+
+
+16. IMPORTANT PATH NOTE
+=======================
+
+The paths mentioned in this document are the original local Windows
+development paths.
+
+If the project is cloned to another computer, update:
+
+DATASET
+
+and
+
+OUTPUT
+
+paths according to the new project location.
+
+
+17. MODEL FILE NOTE
+===================
+
+The trained best.pt file may not be included in the GitHub repository
+because trained model weights can be large.
+
+If the model is distributed separately, place it in:
+
+models/
+    edith_wildlife/
+        weights/
+            best.pt
+
+
+18. REPRODUCTION FLOW
+=====================
+
+Roboflow Animal2 Dataset
+          |
+          v
+Download YOLOv8 Dataset
+          |
+          v
+Extract Dataset
+          |
+          v
+Configure data.yaml
+          |
+          v
+Load yolo26n.pt
+          |
+          v
+Train for 30 Epochs
+          |
+          v
+Validate Model
+          |
+          v
+best.pt
+          |
+          v
+EDITH Wildlife Detector
+          |
+          v
+Risk Engine
+          |
+          v
+Damage Predictor
+          |
+          v
+Movement Intelligence
+          |
+          v
+EDITH Controller
+
+
+19. PROJECT RESULT
+===================
+
+The trained wildlife detection model became the computer vision
+component of EDITH.ai.
+
+EDITH.ai was developed as a prototype for the:
+
+IMAGECON HACKATHON FEST 2026
+
+Project:
+Smart Crop Protection and Human-Wildlife Conflict Management Using
+Artificial Intelligence
+
+Achievement:
+
+1st Place - IMAGECON Hackathon Fest 2026
+
+
+===================================================
+END OF DATASET & MODEL TRAINING GUIDE
+===================================================
