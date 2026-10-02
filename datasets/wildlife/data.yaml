@@ -1,0 +1,13 @@
+path: E:/Projects/EDITH.ai/datasets/wildlife
+
+train: images/train
+val: images/val
+
+names:
+  0: elephant
+  1: wild_boar
+  2: deer
+  3: leopard
+  4: tiger
+  5: bear
+  6: monkey
