@@ -1,0 +1,6 @@
+streamlit
+ultralytics==8.4.162
+opencv-python-headless
+numpy
+pandas
+Pillow
